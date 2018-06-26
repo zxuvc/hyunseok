@@ -7,32 +7,32 @@ int Cipher(uint8_t cipher)
 
                     case 0:
                         printf("Group Cipher Suite 사용\n");
-                        cipher = 11; //Group Cipher Suite flsg:21
+                        cipher = GROUP_CIPHER_SUITE; //Group Cipher Suite flsg:21
                         break;
 
                     case 1:
                         printf("WEP-40 사용\n");
-                        cipher = 12; //WEP-40 flag:22
+                        cipher = WEP40; //WEP-40 flag:12
                         break;
 
                     case 2:
                         printf("TKIP 사용\n");
-                        cipher = 13; //TKIP flag:23
+                        cipher = TKIP; //TKIP flag:13
                         break;
 
                     case 3:
                         printf("예약 사용\n");
-                        cipher = 14; //예약 flag:24
+                        cipher = C_RESERVATON; //예약 flag:14
                         break;
 
                     case 4:
                         printf("CCMP 사용\n");
-                        cipher = 15; //CCMP flag:25
+                        cipher = CCMP; //CCMP flag:15
                         break;
 
                     case 5:
                         printf("WEP-104 사용\n");
-                        cipher = 16; //WEP-104 flag:26
+                        cipher = WEP104; //WEP-104 flag:16
                         break;
 
                 printf("Cipher fun:%d\n", cipher);
@@ -46,17 +46,17 @@ int Auth(uint8_t auth)
     {
     case 0:
         printf("예약 사용\n");
-        auth = 17;
+        auth = A_RESERVATON;//flag:17
         break;
 
     case 1:
         printf("802.1X 인증\n");
-        auth = 18;
+        auth = A_8021X;//flag:18
         break;
 
     case 2:
         printf("PSK 인증\n");
-        auth = 19;
+        auth = PSK;//flag:19
         break;
 
     default:
@@ -95,10 +95,12 @@ void misconfigureAP (const u_int8_t *data)
     printf("--------------------------------\n");
     uint8_t apMac[6]; //BSS = AP MAC
     sM->wep = fC->protectedFrame;
+    /*
     if(fC->protectedFrame == 1)
     {
     printf("WEP: %d*********************************************************************************",fC->protectedFrame);
     }
+    */
     int a, b, c, d;
     //printf("%d",sM->wep);
 /*비콘 아닐때도 48, 221있는듯? 221은 확실히있음
@@ -121,7 +123,7 @@ void misconfigureAP (const u_int8_t *data)
                 apMac[4] = mF->addr3[4];
                 apMac[5] = mF->addr3[5];
 
-                printf("AP MAC: %02x:%02x:%02x:%02x:%02x:%02x\n",apMac[0],apMac[1],apMac[2],apMac[3],apMac[4],apMac[5]);
+                //printf("AP MAC: %02x:%02x:%02x:%02x:%02x:%02x\n",apMac[0],apMac[1],apMac[2],apMac[3],apMac[4],apMac[5]);
 
                 while((oF->elementId | oF->length )!= 0)//OptionFrame
                 {
@@ -133,64 +135,65 @@ void misconfigureAP (const u_int8_t *data)
                         sM->gCSS[1] = rsn->gCSS[1];
                         sM->gCSS[2] = rsn->gCSS[2];
                         sM->gCSS[3] = rsn->gCSS[3];//Type
-                        printf("Group OUI : %02x-%02x-%02x\n",sM->gCSS[0], sM->gCSS[1], sM->gCSS[2]);//Group OUI
-                        printf("sM->gCSS[3]: %d\n",sM->gCSS[3]);
-                        printf("sM->gCSS[3]: %d\n",rsn->gCSS[3]);
+                        //printf("Group OUI : %02x-%02x-%02x\n",sM->gCSS[0], sM->gCSS[1], sM->gCSS[2]);//Group OUI
+                        //printf("sM->gCSS[3]: %d\n",sM->gCSS[3]);
+                        //printf("sM->gCSS[3]: %d\n",rsn->gCSS[3]);
                         sM->pCSS[0] = rsn->pCSS[0];//00-0f-ac
                         sM->pCSS[1] = rsn->pCSS[1];
                         sM->pCSS[2] = rsn->pCSS[2];
                         sM->pCSS[3] = rsn->pCSS[3];//Type
-                        printf("count:%d\n",rsn->pCSC);
+                        //printf("count:%d\n",rsn->pCSC);
 
 
                         if(rsn->pCSC != 0x01)
                         {
+                            printf("77777777777777777777777777777777777777777777777777\n");
                             rsn = (Rsn *)(uint8_t*)oF+sizeof(rsn->pCSC)*4;
                             printf("count value: %d\n",sizeof(rsn->pCSC)*4);
                             printf("AKM: %d\n",rsn->aSS[2]);
                             printf("AKM: %d\n",rsn->aSS[3]);
-                            //rsn = (Rsn *)((uint8_t*)rsn+10+(rsn->pCSC*4))+2+(rsn->aSC*4);
-                            //printf("count: %x %x %x %x",aS->aSS[0],aS->aSS[1],aS->aSS[2],aS->aSS[3]);
+                           // rsn = (Rsn *)((uint8_t*)rsn+10+sizeof(rsn->pCSC)*4+2+sizeof(rsn->aSC)*4);
+                           // printf("count: %x %x %x %x",aS->aSS[0],aS->aSS[1],aS->aSS[2],aS->aSS[3]);
 
                             //sizeof(rsn->pCSC * 4
                         }
-                        printf("Pairwise OUI : %02x-%02x-%02x\n",sM->pCSS[0], sM->pCSS[1], sM->pCSS[2]);//Pairwise OUI
+                        //printf("Pairwise OUI : %02x-%02x-%02x\n",sM->pCSS[0], sM->pCSS[1], sM->pCSS[2]);//Pairwise OUI
                         //printf("sM->pCSS[3]: %d\n",sM->pCSS[3]);
-                        printf("sM->pCSS[3]: %d\n",sM->pCSS[3]);
-                        printf("sM->pCSS[3]: %d\n",rsn->pCSS[3]);
+                        //printf("sM->pCSS[3]: %d\n",sM->pCSS[3]);
+                        //printf("sM->pCSS[3]: %d\n",rsn->pCSS[3]);
                         sM->aSS[0] = rsn->aSS[0];//00-0f-ac
                         sM->aSS[1] = rsn->aSS[1];
                         sM->aSS[2] = rsn->aSS[2];
                         sM->aSS[3] = rsn->aSS[3];//Type
-                        printf("sM->aSS[3]: %d\n",sM->aSS[3]);
-                        printf("sM->aSS[3]: %d\n",rsn->aSS[3]);
+                       //printf("sM->aSS[3]: %d\n",sM->aSS[3]);
+                        //printf("sM->aSS[3]: %d\n",rsn->aSS[3]);
                      }
 
                     else if(oF->elementId == 221)//Vendor specific ID:221
                     {
                         vS = (VendorSpecific *)(uint8_t*)oF;
-                        printf("OUI : %02x-%02x-%02x\n",vS->oUI[0], vS->oUI[1], vS->oUI[2]);//OUI
-                        printf("vST: %02x\n", vS->vST);
+                        //printf("OUI : %02x-%02x-%02x\n",vS->oUI[0], vS->oUI[1], vS->oUI[2]);//OUI
+                        //printf("vST: %02x\n", vS->vST);
 
                         if(vS->oUI[0] == 0x00 && vS->oUI[1] == 0x50 && vS->oUI[2] == 0xf2)//OUI 00-50-f2
                         {
                             if(vS->vST == 0x01)//1: WPA Information Type-> WPA-1 & 2: WMM/WME -> CCMP 일때 2임...?
                             {
-                            printf("bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb\n");
+                            //printf("bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb\n");
 
                             sM->oUI[0] = vS->oUI[0];//00-50-f2
                             sM->oUI[1] = vS->oUI[1];
                             sM->oUI[2] = vS->oUI[2];
                             sM->mCSS[3] = vS->mCSS[3]; //Type =1 WPA Information
-                            printf("sM->mCSS[3]: %d\n",sM->mCSS[3]);
-                            printf("sM->mCSS[3]: %d\n",vS->mCSS[3]);
+                            //printf("sM->mCSS[3]: %d\n",sM->mCSS[3]);
+                            //printf("sM->mCSS[3]: %d\n",vS->mCSS[3]);
                             sM->uCSS[3] = vS->uCSS[3]; //type
-                            printf("sM->uCSS[3]: %d\n",sM->uCSS[3]);
-                            printf("sM->uCSS[3]: %d\n",vS->uCSS[3]);
+                            //printf("sM->uCSS[3]: %d\n",sM->uCSS[3]);
+                            //printf("sM->uCSS[3]: %d\n",vS->uCSS[3]);
                             //sM->vST = vS->vST;//type
                             sM->aKMS[3] = vS->aSS[3]; //type
-                            printf("sM->aKMS[3]: %d\n",sM->aKMS[3]);
-                            printf("sM->aKM6jS[3]: %d\n",vS->aSS[3]);
+                            //printf("sM->aKMS[3]: %d\n",sM->aKMS[3]);
+                            //printf("sM->aKM6jS[3]: %d\n",vS->aSS[3]);
 
                             /*
                             printf("OUI : %02x-%02x-%02x\n",vS->oUI[0], vS->oUI[1], vS->oUI[2]);//OUI
@@ -206,7 +209,7 @@ void misconfigureAP (const u_int8_t *data)
 
                             if(vS->vST == 0x02)//1: WPA Information Type-> WPA-1 & 2: WMM/WME -> CCMP 일때 2임...?
                             {
-                            printf("cccccccccccccccccccccccccccccccccc\n");
+                            //printf("cccccccccccccccccccccccccccccccccc\n");
 
                             sM->oUI[0] = vS->oUI[0];//00-50-f2
                             sM->oUI[1] = vS->oUI[1];
@@ -223,10 +226,10 @@ void misconfigureAP (const u_int8_t *data)
                sM->gCSS[0] == 0x00 && sM->gCSS[1] == 0x0f && sM->gCSS[2] == 0xac)//OUI 00-50-f2 && OUI 00-0f-ac -> WPA2
             {
                 a = 20; //WPA-2 flsg:20
-                sF->enc = a;
+                sF->enc = WPA2;
                 printf("WPA-2: %d\n", sF->enc);
                 //sF->enc = 20; //WPA-2 flsg:20
-                printf("aaaaaaaaaaaaaaaaaaaaaaaaa\n");
+                //printf("aaaaaaaaaaaaaaaaaaaaaaaaa\n");
                 printf("Group Cipher Suite Selector: %d\n",sM->gCSS[3]);//Group Cipher Suite Selector(multicast) Type
                 sF->groupCipher = Cipher(sM->gCSS[3]);
                 printf("Flag: %d\n", sF->groupCipher);
@@ -243,7 +246,7 @@ void misconfigureAP (const u_int8_t *data)
             else if(sM->oUI[0] == 0x00 && sM->oUI[1] == 0x50 && sM->oUI[2] == 0xf2)//OUI 00-50-f2 -> WPA-1
             {
                // printf("WPA-1\n");
-                sF->enc = 10; //WPA-1 flsg:10
+                sF->enc = WPA1; //WPA-1 flsg:10
                 printf("WPA-1: %d\n", sF->enc);
 
                 printf("Group Cipher Suite Selector: %d\n",sM->mCSS[3]);//Group Cipher Suite Selector(multicast) Type
@@ -261,14 +264,14 @@ void misconfigureAP (const u_int8_t *data)
 
             if(sM->wep == 1)//WEP
             {
-                sF->enc = 1; //WEP flsg:1
-                printf("WEP: %d\n", sF->enc);
+                sF->enc = WEP; //WEP flsg:1
+                printf("WEP flag: %d\n", sF->enc);
             }
 
             if(sM->wep == 0 && rsn->elementId != 48 && vS->elementId != 221)//OPEN
             {
-                sF->enc = 0; //OPEN flsg:0
-                printf("OPEN: %d\n", sF->enc);
+                sF->enc = OPEN; //OPEN flsg:0
+                printf("OPEN flag: %d\n", sF->enc);
             }
 
             /*

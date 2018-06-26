@@ -9,6 +9,23 @@
 #include <iostream>
 #include <string.h>
 
+//ENC
+#define WEP 1
+#define WPA1 10
+#define WPA2 20
+//Cipher
+#define OPEN 0
+#define GROUP_CIPHER_SUITE 11
+#define WEP40 12
+#define TKIP 13
+#define C_RESERVATON 14//예약사용
+#define CCMP 15
+#define WEP104 16
+//Auth
+#define A_RESERVATON 17//예약사용
+#define A_8021X 18//802.1X
+#define PSK 19
+
 
 using std::cout;
 using std::endl;
@@ -134,7 +151,7 @@ struct BeaconFrameBody
     uint16_t  capacityInformation;
 };
 
-struct AkmSuiteSelector
+struct AkmSuiteSelector//??
 {
     //uint16_t aSC; //AKM Suite Count
     uint8_t aSS[4]; //AKM Suite Selector 4x가변길이.. aSS[3] = type
