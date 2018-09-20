@@ -31,6 +31,8 @@ using std::cout;
 using std::endl;
 #pragma pack(push, 1)
 
+
+
 struct SecurityFlag
 {
    int8_t enc;//Encrypt
@@ -43,12 +45,16 @@ struct SecurityMethod
 {
     uint8_t wep:1;//WEP
     uint8_t gCSS[4]; //Group Cipher Suite Selector gcss[3] = type; ID=48
+    uint16_t pCSC; //Pairwise Cipher Suite Count
+    uint8_t aSC[2]; //AKM Suite Count
     uint8_t pCSS[4]; //Pairwise Cipher Suite Selector 4x가변길이.. pcss[3] = type ID=48
     uint8_t aSS[4]; //AKM Suite Selector 4x가변길이.. akmss[3] = type ID=48
     uint8_t oUI[3]; //Organizationally unique identifier ID=221
-    uint8_t mCSS[4]; //Group Cipher Suite Selector gcss[3] = type; ID=48 //필요없을듯?
+    uint8_t mCSS[4]; //Group Cipher Suite Selector gcss[3] = type; ID=221 //필요없을듯?
+    uint16_t uCSC; //Pairwise Cipher Suite Count
     uint8_t uCSS[4]; //unicast Cipher Suite Select OUI 4x가변길이 uCSS[3] = type ID=221
-    uint8_t aKMS[4]; //AKM Suite Selector1 4x가변길이.. aSS[3] = type
+    uint8_t aKMC[2]; //AKM Suite Count
+    uint8_t aKMS[4]; //AKM Suite Selector1 4x가변길이.. aSS[3] = type ID=221
     uint8_t vST; //Vendor Specific (OUI) Type 필요없음??
 };
 
@@ -106,6 +112,12 @@ struct RadiotapHeader
            uint8_t    antenna;
 };
 
+struct PairwiseCipherSuiteSelector //Pairwise Cipher Suite Selector 4x가변길이 <-pCSS[4];
+{
+    uint8_t pOUI[3]; // pOUI[0] == Rsn.pCSS[0], pOUI[1] == Rsn.pCSS[1], pOUI[2] == Rsn.pCSS[2]
+    uint8_t pTYPE; // pTYPE == Rsn.pCSS[3]
+};
+
 struct Rsn
 {
     uint8_t elementId; //Element_ID
@@ -113,8 +125,9 @@ struct Rsn
     uint16_t version;
     uint8_t gCSS[4]; //Group Cipher Suite Selector gcss[3] = type
     uint16_t pCSC; //Pairwise Cipher Suite Count
-    uint8_t pCSS[4]; //Pairwise Cipher Suite Selector 4x가변길이.. pcss[3] = type
-    uint16_t aSC; //AKM Suite Count
+    PairwiseCipherSuiteSelector pCSS;
+    //uint8_t pCSS[4]; //Pairwise Cipher Suite Selector 4x가변길이.. pcss[3] = type
+    uint8_t aSC[2]; //AKM Suite Count
     uint8_t aSS[4]; //AKM Suite Selector 4x가변길이.. aSS[3] = type
     uint16_t rsnC; //RSN Capabilities
     uint16_t pmkC; //PMK Count
@@ -123,7 +136,7 @@ struct Rsn
 
 struct VendorSpecific
 {
-    uint8_t elementId; //Element_ID
+    uint8_t elementId; //Element_ID 221
     uint8_t length; //Length
     uint8_t oUI[3]; //Organizationally unique identifier
     uint8_t vST; //Vendor Specific (OUI) Type
@@ -131,7 +144,7 @@ struct VendorSpecific
     uint8_t mCSS[4]; //Multicast Cipher Suite Select OUI mCSS[3] = type
     uint16_t uCSC; //unicast Cipher Suite Count
     uint8_t uCSS[4]; //unicast Cipher Suite Select OUI 4x가변길이 uCSS[3] = type
-    uint16_t aSC; //AKM Suite Count
+    uint8_t aSC[2]; //AKM Suite Count
     uint8_t aSS[4]; //AKM Suite Selector 4x가변길이.. aSS[3] = type
 };
 
@@ -161,4 +174,3 @@ struct AkmSuiteSelector//??
 void misconfigureAP (const uint8_t *);
 int Cipher(uint8_t *);
 int Auth(uint8_t *);
-
